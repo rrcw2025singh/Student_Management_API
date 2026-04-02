@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { HTTP } from "../../../../constants/httpConstants";
+import { HTTP } from "../../../constants/httpConstants";
 import { validateStudent } from "../validation/studentValidation";
 import {
   getAllStudents,
