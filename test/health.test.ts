@@ -1,6 +1,7 @@
-/// <reference types="jest" />
+
 
 import request from "supertest";
+
 import app from "../src/app";
 
 describe("Health Endpoint", () => {
@@ -13,7 +14,9 @@ describe("Health Endpoint", () => {
 
     // Assert
     expect(response.status).toBe(200);
-    expect(response.body.success).toBe(true);
-    expect(response.body.message).toBe("API is healthy");
+    expect(response.body).toEqual({
+      success: true,
+      message: "API is healthy",
+    });
   });
 });
