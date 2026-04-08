@@ -22,7 +22,9 @@
   },
   "homepage": "https://github.com/rrcw2025singh/Student_Management_API#readme",
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
@@ -30,6 +32,7 @@
     "@types/mocha": "^10.0.10",
     "@types/node": "^25.5.0",
     "@types/supertest": "^7.2.0",
+    "@types/swagger-ui-express": "^4.1.8",
     "jest": "^30.3.0",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.9",
