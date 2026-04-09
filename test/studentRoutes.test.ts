@@ -63,7 +63,9 @@ describe("Student API Endpoints", () => {
       yearLevel: 1,
     };
 
-    const createResponse = await request(app).post(createEndpoint).send(studentData);
+    const createResponse = await request(app)
+      .post(createEndpoint)
+      .send(studentData);
     const studentId = createResponse.body.id;
 
     // Act
@@ -91,7 +93,9 @@ describe("Student API Endpoints", () => {
       yearLevel: 2,
     };
 
-    const createResponse = await request(app).post(createEndpoint).send(studentData);
+    const createResponse = await request(app)
+      .post(createEndpoint)
+      .send(studentData);
     const studentId = createResponse.body.id;
 
     // Act
@@ -105,6 +109,32 @@ describe("Student API Endpoints", () => {
     expect(response.body.yearLevel).toBe(2);
   });
 
+  it("should return 400 for invalid update data", async () => {
+    // Arrange
+    const createEndpoint = "/api/v1/students";
+    const studentData = {
+      firstName: "Karan",
+      lastName: "Singh",
+      email: "karan@example.com",
+      program: "AD&D",
+      yearLevel: 1,
+    };
+
+    const createResponse = await request(app)
+      .post(createEndpoint)
+      .send(studentData);
+    const studentId = createResponse.body.id;
+
+    // Act
+    const response = await request(app)
+      .put(`/api/v1/students/${studentId}`)
+      .send({ yearLevel: "second" });
+
+    // Assert
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe("Year level must be a number");
+  });
+
   it("should delete a student by id", async () => {
     // Arrange
     const createEndpoint = "/api/v1/students";
@@ -116,7 +146,9 @@ describe("Student API Endpoints", () => {
       yearLevel: 1,
     };
 
-    const createResponse = await request(app).post(createEndpoint).send(studentData);
+    const createResponse = await request(app)
+      .post(createEndpoint)
+      .send(studentData);
     const studentId = createResponse.body.id;
 
     // Act
