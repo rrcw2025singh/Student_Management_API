@@ -6,3 +6,11 @@ export interface Student {
   program: string;
   yearLevel: number;
 }
+
+export interface StudentQuery {
+  firstName?: string;
+  program?: string;
+  yearLevel?: string;
+  sortBy?: "firstName" | "lastName" | "email" | "program" | "yearLevel";
+  order?: "asc" | "desc";
+}
