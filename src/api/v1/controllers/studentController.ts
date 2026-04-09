@@ -50,7 +50,59 @@ export const createStudentHandler = (req: Request, res: Response): void => {
 
 export const updateStudentHandler = (req: Request, res: Response): void => {
   const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-  const updatedStudent = updateStudent(id, req.body);
+  const updatedData = req.body;
+
+  if (
+    updatedData.firstName !== undefined &&
+    typeof updatedData.firstName !== "string"
+  ) {
+    res.status(HTTP.BAD_REQUEST).json({
+      message: "First name must be a string",
+    });
+    return;
+  }
+
+  if (
+    updatedData.lastName !== undefined &&
+    typeof updatedData.lastName !== "string"
+  ) {
+    res.status(HTTP.BAD_REQUEST).json({
+      message: "Last name must be a string",
+    });
+    return;
+  }
+
+  if (
+    updatedData.email !== undefined &&
+    typeof updatedData.email !== "string"
+  ) {
+    res.status(HTTP.BAD_REQUEST).json({
+      message: "Email must be a string",
+    });
+    return;
+  }
+
+  if (
+    updatedData.program !== undefined &&
+    typeof updatedData.program !== "string"
+  ) {
+    res.status(HTTP.BAD_REQUEST).json({
+      message: "Program must be a string",
+    });
+    return;
+  }
+
+  if (
+    updatedData.yearLevel !== undefined &&
+    typeof updatedData.yearLevel !== "number"
+  ) {
+    res.status(HTTP.BAD_REQUEST).json({
+      message: "Year level must be a number",
+    });
+    return;
+  }
+
+  const updatedStudent = updateStudent(id, updatedData);
 
   if (!updatedStudent) {
     res.status(HTTP.NOT_FOUND).json({ message: "Student not found" });
