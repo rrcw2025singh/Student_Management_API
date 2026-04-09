@@ -1,9 +1,43 @@
-import { Student } from "../models/studentModel";
+import { Student, StudentQuery } from "../models/studentModel";
 
 let students: Student[] = [];
 
-export const getAllStudents = (): Student[] => {
-  return students;
+export const getAllStudents = (query?: StudentQuery): Student[] => {
+  let result = [...students];
+
+  if (query?.firstName) {
+    result = result.filter((student) =>
+      student.firstName.toLowerCase().includes(query.firstName!.toLowerCase())
+    );
+  }
+
+  if (query?.program) {
+    result = result.filter((student) =>
+      student.program.toLowerCase().includes(query.program!.toLowerCase())
+    );
+  }
+
+  if (query?.yearLevel) {
+    result = result.filter(
+      (student) => student.yearLevel === Number(query.yearLevel)
+    );
+  }
+
+  if (query?.sortBy) {
+    const sortField = query.sortBy;
+    const sortOrder = query.order === "desc" ? -1 : 1;
+
+    result.sort((a, b) => {
+      const aValue = a[sortField];
+      const bValue = b[sortField];
+
+      if (aValue < bValue) return -1 * sortOrder;
+      if (aValue > bValue) return 1 * sortOrder;
+      return 0;
+    });
+  }
+
+  return result;
 };
 
 export const getStudentById = (id: string): Student | undefined => {
@@ -11,6 +45,14 @@ export const getStudentById = (id: string): Student | undefined => {
 };
 
 export const createStudent = (student: Student): Student => {
+  const existingStudent = students.find(
+    (existing) => existing.email.toLowerCase() === student.email.toLowerCase()
+  );
+
+  if (existingStudent) {
+    throw new Error("Student with this email already exists");
+  }
+
   students.push(student);
   return student;
 };
@@ -23,6 +65,17 @@ export const updateStudent = (
 
   if (!student) {
     return null;
+  }
+
+  if (updatedData.email) {
+    const emailExists = students.find(
+      (s) =>
+        s.id !== id && s.email.toLowerCase() === updatedData.email!.toLowerCase()
+    );
+
+    if (emailExists) {
+      throw new Error("Student with this email already exists");
+    }
   }
 
   Object.assign(student, updatedData);
