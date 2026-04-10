@@ -22,9 +22,37 @@ const router = Router();
  *   get:
  *     summary: Get all students
  *     tags: [Students]
+ *     parameters:
+ *       - in: query
+ *         name: firstName
+ *         schema:
+ *           type: string
+ *         description: Filter students by first name
+ *       - in: query
+ *         name: program
+ *         schema:
+ *           type: string
+ *         description: Filter students by program
+ *       - in: query
+ *         name: yearLevel
+ *         schema:
+ *           type: string
+ *         description: Filter students by year level
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *           enum: [firstName, lastName, email, program, yearLevel]
+ *         description: Sort students by field
+ *       - in: query
+ *         name: order
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *         description: Sort order
  *     responses:
  *       200:
- *         description: List of all students
+ *         description: List of students returned successfully
  */
 router.get("/", getStudentsHandler);
 
@@ -119,6 +147,8 @@ router.post("/", createStudentHandler);
  *     responses:
  *       200:
  *         description: Student updated successfully
+ *       400:
+ *         description: Invalid update data
  *       404:
  *         description: Student not found
  */
