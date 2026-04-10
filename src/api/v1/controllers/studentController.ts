@@ -8,10 +8,27 @@ import {
   updateStudent,
   deleteStudent,
 } from "../services/studentServices";
-import { Student } from "../models/studentModel";
+import { Student, StudentQuery } from "../models/studentModel";
 
-export const getStudentsHandler = (_req: Request, res: Response): void => {
-  const students = getAllStudents();
+export const getStudentsHandler = (req: Request, res: Response): void => {
+  const query: StudentQuery = {
+    firstName:
+      typeof req.query.firstName === "string" ? req.query.firstName : undefined,
+    program:
+      typeof req.query.program === "string" ? req.query.program : undefined,
+    yearLevel:
+      typeof req.query.yearLevel === "string" ? req.query.yearLevel : undefined,
+    sortBy:
+      typeof req.query.sortBy === "string"
+        ? (req.query.sortBy as StudentQuery["sortBy"])
+        : undefined,
+    order:
+      typeof req.query.order === "string"
+        ? (req.query.order as StudentQuery["order"])
+        : undefined,
+  };
+
+  const students = getAllStudents(query);
   res.status(HTTP.OK).json(students);
 };
 
@@ -44,8 +61,14 @@ export const createStudentHandler = (req: Request, res: Response): void => {
     yearLevel: req.body.yearLevel,
   };
 
-  const createdStudent = createStudent(newStudent);
-  res.status(HTTP.CREATED).json(createdStudent);
+  try {
+    const createdStudent = createStudent(newStudent);
+    res.status(HTTP.CREATED).json(createdStudent);
+  } catch (error) {
+    res.status(HTTP.BAD_REQUEST).json({
+      message: error instanceof Error ? error.message : "Unable to create student",
+    });
+  }
 };
 
 export const updateStudentHandler = (req: Request, res: Response): void => {
@@ -102,14 +125,20 @@ export const updateStudentHandler = (req: Request, res: Response): void => {
     return;
   }
 
-  const updatedStudent = updateStudent(id, updatedData);
+  try {
+    const updatedStudent = updateStudent(id, updatedData);
 
-  if (!updatedStudent) {
-    res.status(HTTP.NOT_FOUND).json({ message: "Student not found" });
-    return;
+    if (!updatedStudent) {
+      res.status(HTTP.NOT_FOUND).json({ message: "Student not found" });
+      return;
+    }
+
+    res.status(HTTP.OK).json(updatedStudent);
+  } catch (error) {
+    res.status(HTTP.BAD_REQUEST).json({
+      message: error instanceof Error ? error.message : "Unable to update student",
+    });
   }
-
-  res.status(HTTP.OK).json(updatedStudent);
 };
 
 export const deleteStudentHandler = (req: Request, res: Response): void => {
