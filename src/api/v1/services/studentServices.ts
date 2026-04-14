@@ -6,14 +6,16 @@ export const getAllStudents = (query?: StudentQuery): Student[] => {
   let result = [...students];
 
   if (query?.firstName) {
+    const firstName = query.firstName.toLowerCase();
     result = result.filter((student) =>
-      student.firstName.toLowerCase().includes(query.firstName!.toLowerCase())
+      student.firstName.toLowerCase().includes(firstName)
     );
   }
 
   if (query?.program) {
+    const program = query.program.toLowerCase();
     result = result.filter((student) =>
-      student.program.toLowerCase().includes(query.program!.toLowerCase())
+      student.program.toLowerCase().includes(program)
     );
   }
 
@@ -68,15 +70,16 @@ export const updateStudent = (
   }
 
   if (updatedData.email) {
-    const emailExists = students.find(
-      (s) =>
-        s.id !== id && s.email.toLowerCase() === updatedData.email!.toLowerCase()
-    );
+  const updatedEmail = updatedData.email.toLowerCase();
 
-    if (emailExists) {
-      throw new Error("Student with this email already exists");
-    }
+  const emailExists = students.find(
+    (s) => s.id !== id && s.email.toLowerCase() === updatedEmail
+  );
+
+  if (emailExists) {
+    throw new Error("Student with this email already exists");
   }
+}
 
   Object.assign(student, updatedData);
   return student;
