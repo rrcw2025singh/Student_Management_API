@@ -1,6 +1,6 @@
 import swaggerJSDoc from "swagger-jsdoc";
 
-const options: any = {
+const options: swaggerJSDoc.Options = {
   definition: {
     openapi: "3.0.0",
     info: {
@@ -14,6 +14,15 @@ const options: any = {
         description: "Local server",
       },
     ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
   },
   apis: ["./src/api/v1/routes/*.ts"],
 };
