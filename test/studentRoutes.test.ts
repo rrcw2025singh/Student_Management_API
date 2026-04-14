@@ -3,11 +3,14 @@ import app from "../src/app";
 import { clearStudents } from "../src/api/v1/services/studentServices";
 
 describe("Student API Endpoints", () => {
+  const adminHeader = { Authorization: "Bearer admin-token" };
+  const userHeader = { Authorization: "Bearer user-token" };
+
   beforeEach(() => {
     clearStudents();
   });
 
-  it("should create a student", async () => {
+  it("should create a student as admin", async () => {
     // Arrange
     const endpoint = "/api/v1/students";
     const studentData = {
@@ -19,15 +22,40 @@ describe("Student API Endpoints", () => {
     };
 
     // Act
-    const response = await request(app).post(endpoint).send(studentData);
+    const response = await request(app)
+      .post(endpoint)
+      .set(adminHeader)
+      .send(studentData);
 
     // Assert
     expect(response.status).toBe(201);
-    expect(response.body.firstName).toBe("Karan");
-    expect(response.body.lastName).toBe("Singh");
-    expect(response.body.email).toBe("karan@example.com");
-    expect(response.body.program).toBe("AD&D");
-    expect(response.body.yearLevel).toBe(1);
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toBe("Student created successfully");
+    expect(response.body.data.firstName).toBe("Karan");
+    expect(response.body.data.email).toBe("karan@example.com");
+  });
+
+  it("should not create a student as normal user", async () => {
+    // Arrange
+    const endpoint = "/api/v1/students";
+    const studentData = {
+      firstName: "Karan",
+      lastName: "Singh",
+      email: "karan@example.com",
+      program: "AD&D",
+      yearLevel: 1,
+    };
+
+    // Act
+    const response = await request(app)
+      .post(endpoint)
+      .set(userHeader)
+      .send(studentData);
+
+    // Assert
+    expect(response.status).toBe(403);
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBe("Forbidden. Admin access only.");
   });
 
   it("should get all students", async () => {
@@ -41,121 +69,128 @@ describe("Student API Endpoints", () => {
       yearLevel: 1,
     };
 
-    await request(app).post(endpoint).send(studentData);
+    await request(app).post(endpoint).set(adminHeader).send(studentData);
 
     // Act
-    const response = await request(app).get(endpoint);
+    const response = await request(app).get(endpoint).set(userHeader);
 
     // Assert
     expect(response.status).toBe(200);
-    expect(response.body.length).toBe(1);
-    expect(response.body[0].firstName).toBe("Karan");
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toBe("Students retrieved successfully");
+    expect(response.body.data.length).toBe(1);
+    expect(response.body.data[0].firstName).toBe("Karan");
   });
 
   it("should get a student by id", async () => {
     // Arrange
-    const createEndpoint = "/api/v1/students";
-    const studentData = {
-      firstName: "Karan",
-      lastName: "Singh",
-      email: "karan@example.com",
-      program: "AD&D",
-      yearLevel: 1,
-    };
-
     const createResponse = await request(app)
-      .post(createEndpoint)
-      .send(studentData);
-    const studentId = createResponse.body.id;
+      .post("/api/v1/students")
+      .set(adminHeader)
+      .send({
+        firstName: "Karan",
+        lastName: "Singh",
+        email: "karan@example.com",
+        program: "AD&D",
+        yearLevel: 1,
+      });
+
+    const studentId = createResponse.body.data.id;
 
     // Act
-    const response = await request(app).get(`/api/v1/students/${studentId}`);
+    const response = await request(app)
+      .get(`/api/v1/students/${studentId}`)
+      .set(userHeader);
 
     // Assert
     expect(response.status).toBe(200);
-    expect(response.body.id).toBe(studentId);
-    expect(response.body.firstName).toBe("Karan");
+    expect(response.body.success).toBe(true);
+    expect(response.body.data.id).toBe(studentId);
+    expect(response.body.data.firstName).toBe("Karan");
   });
 
-  it("should update a student by id", async () => {
+  it("should update a student by id as admin", async () => {
     // Arrange
-    const createEndpoint = "/api/v1/students";
-    const studentData = {
-      firstName: "Karan",
-      lastName: "Singh",
-      email: "karan@example.com",
-      program: "AD&D",
-      yearLevel: 1,
-    };
+    const createResponse = await request(app)
+      .post("/api/v1/students")
+      .set(adminHeader)
+      .send({
+        firstName: "Karan",
+        lastName: "Singh",
+        email: "karan@example.com",
+        program: "AD&D",
+        yearLevel: 1,
+      });
 
+    const studentId = createResponse.body.data.id;
     const updatedData = {
       program: "Software Development",
       yearLevel: 2,
     };
 
-    const createResponse = await request(app)
-      .post(createEndpoint)
-      .send(studentData);
-    const studentId = createResponse.body.id;
-
     // Act
     const response = await request(app)
       .put(`/api/v1/students/${studentId}`)
+      .set(adminHeader)
       .send(updatedData);
 
     // Assert
     expect(response.status).toBe(200);
-    expect(response.body.program).toBe("Software Development");
-    expect(response.body.yearLevel).toBe(2);
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toBe("Student updated successfully");
+    expect(response.body.data.program).toBe("Software Development");
+    expect(response.body.data.yearLevel).toBe(2);
   });
 
   it("should return 400 for invalid update data", async () => {
     // Arrange
-    const createEndpoint = "/api/v1/students";
-    const studentData = {
-      firstName: "Karan",
-      lastName: "Singh",
-      email: "karan@example.com",
-      program: "AD&D",
-      yearLevel: 1,
-    };
-
     const createResponse = await request(app)
-      .post(createEndpoint)
-      .send(studentData);
-    const studentId = createResponse.body.id;
+      .post("/api/v1/students")
+      .set(adminHeader)
+      .send({
+        firstName: "Karan",
+        lastName: "Singh",
+        email: "karan@example.com",
+        program: "AD&D",
+        yearLevel: 1,
+      });
+
+    const studentId = createResponse.body.data.id;
 
     // Act
     const response = await request(app)
       .put(`/api/v1/students/${studentId}`)
+      .set(adminHeader)
       .send({ yearLevel: "second" });
 
     // Assert
     expect(response.status).toBe(400);
-    expect(response.body.message).toBe("Year level must be a number");
+    expect(response.body.success).toBe(false);
   });
 
-  it("should delete a student by id", async () => {
+  it("should delete a student by id as admin", async () => {
     // Arrange
-    const createEndpoint = "/api/v1/students";
-    const studentData = {
-      firstName: "Karan",
-      lastName: "Singh",
-      email: "karan@example.com",
-      program: "AD&D",
-      yearLevel: 1,
-    };
-
     const createResponse = await request(app)
-      .post(createEndpoint)
-      .send(studentData);
-    const studentId = createResponse.body.id;
+      .post("/api/v1/students")
+      .set(adminHeader)
+      .send({
+        firstName: "Karan",
+        lastName: "Singh",
+        email: "karan@example.com",
+        program: "AD&D",
+        yearLevel: 1,
+      });
+
+    const studentId = createResponse.body.data.id;
 
     // Act
-    const response = await request(app).delete(`/api/v1/students/${studentId}`);
+    const response = await request(app)
+      .delete(`/api/v1/students/${studentId}`)
+      .set(adminHeader);
 
     // Assert
     expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
     expect(response.body.message).toBe("Student deleted successfully");
   });
 
@@ -168,11 +203,14 @@ describe("Student API Endpoints", () => {
     };
 
     // Act
-    const response = await request(app).post(endpoint).send(invalidStudentData);
+    const response = await request(app)
+      .post(endpoint)
+      .set(adminHeader)
+      .send(invalidStudentData);
 
     // Assert
     expect(response.status).toBe(400);
-    expect(response.body.message).toBeDefined();
+    expect(response.body.success).toBe(false);
   });
 
   it("should return 404 for a non-existing student", async () => {
@@ -180,10 +218,62 @@ describe("Student API Endpoints", () => {
     const studentId = "99999";
 
     // Act
-    const response = await request(app).get(`/api/v1/students/${studentId}`);
+    const response = await request(app)
+      .get(`/api/v1/students/${studentId}`)
+      .set(userHeader);
 
     // Assert
     expect(response.status).toBe(404);
+    expect(response.body.success).toBe(false);
     expect(response.body.message).toBe("Student not found");
+  });
+
+  it("should filter students by program", async () => {
+    // Arrange
+    await request(app)
+      .post("/api/v1/students")
+      .set(adminHeader)
+      .send({
+        firstName: "Karan",
+        lastName: "Singh",
+        email: "karan@example.com",
+        program: "AD&D",
+        yearLevel: 1,
+      });
+
+    await request(app)
+      .post("/api/v1/students")
+      .set(adminHeader)
+      .send({
+        firstName: "Aman",
+        lastName: "Brar",
+        email: "aman@example.com",
+        program: "BIT",
+        yearLevel: 2,
+      });
+
+    // Act
+    const response = await request(app)
+      .get("/api/v1/students?program=AD&D")
+      .set(userHeader);
+
+    // Assert
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.data.length).toBe(1);
+    expect(response.body.data[0].program).toBe("AD&D");
+  });
+
+  it("should return 401 without token", async () => {
+    // Arrange
+    const endpoint = "/api/v1/students";
+
+    // Act
+    const response = await request(app).get(endpoint);
+
+    // Assert
+    expect(response.status).toBe(401);
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBe("Unauthorized. Token is missing or invalid.");
   });
 });
