@@ -26,16 +26,16 @@ export const authenticate = (
     return;
   }
 
-  req.body.userRole = token === "admin-token" ? "admin" : "user";
+  res.locals.userRole = token === "admin-token" ? "admin" : "user";
   next();
 };
 
 export const authorizeAdmin = (
-  req: Request,
+  _req: Request,
   res: Response,
   next: NextFunction
 ): void => {
-  if (req.body.userRole !== "admin") {
+  if (res.locals.userRole !== "admin") {
     res.status(HTTP.FORBIDDEN).json({
       success: false,
       message: "Forbidden. Admin access only.",
