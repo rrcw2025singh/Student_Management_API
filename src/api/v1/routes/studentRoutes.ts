@@ -6,6 +6,7 @@ import {
   updateStudentHandler,
   deleteStudentHandler,
 } from "../controllers/studentController";
+import { authenticate, authorizeAdmin } from "../../../middleware/authMiddleware";
 
 const router = Router();
 
@@ -22,39 +23,36 @@ const router = Router();
  *   get:
  *     summary: Get all students
  *     tags: [Students]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: firstName
  *         schema:
  *           type: string
- *         description: Filter students by first name
  *       - in: query
  *         name: program
  *         schema:
  *           type: string
- *         description: Filter students by program
  *       - in: query
  *         name: yearLevel
  *         schema:
  *           type: string
- *         description: Filter students by year level
  *       - in: query
  *         name: sortBy
  *         schema:
  *           type: string
  *           enum: [firstName, lastName, email, program, yearLevel]
- *         description: Sort students by field
  *       - in: query
  *         name: order
  *         schema:
  *           type: string
  *           enum: [asc, desc]
- *         description: Sort order
  *     responses:
  *       200:
- *         description: List of students returned successfully
+ *         description: Students returned successfully
  */
-router.get("/", getStudentsHandler);
+router.get("/", authenticate, getStudentsHandler);
 
 /**
  * @swagger
@@ -62,20 +60,10 @@ router.get("/", getStudentsHandler);
  *   get:
  *     summary: Get a student by ID
  *     tags: [Students]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: Student ID
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Student found successfully
- *       404:
- *         description: Student not found
+ *     security:
+ *       - bearerAuth: []
  */
-router.get("/:id", getStudentByIdHandler);
+router.get("/:id", authenticate, getStudentByIdHandler);
 
 /**
  * @swagger
@@ -83,36 +71,10 @@ router.get("/:id", getStudentByIdHandler);
  *   post:
  *     summary: Create a new student
  *     tags: [Students]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - firstName
- *               - lastName
- *               - email
- *               - program
- *               - yearLevel
- *             properties:
- *               firstName:
- *                 type: string
- *               lastName:
- *                 type: string
- *               email:
- *                 type: string
- *               program:
- *                 type: string
- *               yearLevel:
- *                 type: number
- *     responses:
- *       201:
- *         description: Student created successfully
- *       400:
- *         description: Invalid student data
+ *     security:
+ *       - bearerAuth: []
  */
-router.post("/", createStudentHandler);
+router.post("/", authenticate, authorizeAdmin, createStudentHandler);
 
 /**
  * @swagger
@@ -120,39 +82,10 @@ router.post("/", createStudentHandler);
  *   put:
  *     summary: Update a student by ID
  *     tags: [Students]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: Student ID
- *         schema:
- *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               firstName:
- *                 type: string
- *               lastName:
- *                 type: string
- *               email:
- *                 type: string
- *               program:
- *                 type: string
- *               yearLevel:
- *                 type: number
- *     responses:
- *       200:
- *         description: Student updated successfully
- *       400:
- *         description: Invalid update data
- *       404:
- *         description: Student not found
+ *     security:
+ *       - bearerAuth: []
  */
-router.put("/:id", updateStudentHandler);
+router.put("/:id", authenticate, authorizeAdmin, updateStudentHandler);
 
 /**
  * @swagger
@@ -160,19 +93,9 @@ router.put("/:id", updateStudentHandler);
  *   delete:
  *     summary: Delete a student by ID
  *     tags: [Students]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: Student ID
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Student deleted successfully
- *       404:
- *         description: Student not found
+ *     security:
+ *       - bearerAuth: []
  */
-router.delete("/:id", deleteStudentHandler);
+router.delete("/:id", authenticate, authorizeAdmin, deleteStudentHandler);
 
 export default router;

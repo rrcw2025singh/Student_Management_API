@@ -1,9 +1,15 @@
 import { Student, StudentQuery } from "../models/studentModel";
-
-let students: Student[] = [];
+import {
+  addStudent,
+  findAllStudents,
+  findStudentById,
+  removeStudent,
+  resetStudents,
+  updateStudentById,
+} from "../repositories/studentRepository";
 
 export const getAllStudents = (query?: StudentQuery): Student[] => {
-  let result = [...students];
+  let result = [...findAllStudents()];
 
   if (query?.firstName) {
     const firstName = query.firstName.toLowerCase();
@@ -43,11 +49,11 @@ export const getAllStudents = (query?: StudentQuery): Student[] => {
 };
 
 export const getStudentById = (id: string): Student | undefined => {
-  return students.find((student) => student.id === id);
+  return findStudentById(id);
 };
 
 export const createStudent = (student: Student): Student => {
-  const existingStudent = students.find(
+  const existingStudent = findAllStudents().find(
     (existing) => existing.email.toLowerCase() === student.email.toLowerCase()
   );
 
@@ -55,42 +61,38 @@ export const createStudent = (student: Student): Student => {
     throw new Error("Student with this email already exists");
   }
 
-  students.push(student);
-  return student;
+  return addStudent(student);
 };
 
 export const updateStudent = (
   id: string,
   updatedData: Partial<Student>
 ): Student | null => {
-  const student = students.find((s) => s.id === id);
+  const student = findStudentById(id);
 
   if (!student) {
     return null;
   }
 
   if (updatedData.email) {
-  const updatedEmail = updatedData.email.toLowerCase();
+    const updatedEmail = updatedData.email.toLowerCase();
 
-  const emailExists = students.find(
-    (s) => s.id !== id && s.email.toLowerCase() === updatedEmail
-  );
+    const emailExists = findAllStudents().find(
+      (s) => s.id !== id && s.email.toLowerCase() === updatedEmail
+    );
 
-  if (emailExists) {
-    throw new Error("Student with this email already exists");
+    if (emailExists) {
+      throw new Error("Student with this email already exists");
+    }
   }
-}
 
-  Object.assign(student, updatedData);
-  return student;
+  return updateStudentById(id, updatedData);
 };
 
 export const deleteStudent = (id: string): boolean => {
-  const initialLength = students.length;
-  students = students.filter((student) => student.id !== id);
-  return students.length < initialLength;
+  return removeStudent(id);
 };
 
 export const clearStudents = (): void => {
-  students = [];
+  resetStudents();
 };

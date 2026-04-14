@@ -1,23 +1,27 @@
-export const validateStudent = (data: any): string | null => {
-  if (!data.firstName || typeof data.firstName !== "string") {
-    return "First name is required and must be a string";
-  }
+import Joi from "joi";
 
-  if (!data.lastName || typeof data.lastName !== "string") {
-    return "Last name is required and must be a string";
-  }
+const studentSchema = Joi.object({
+  firstName: Joi.string().trim().required(),
+  lastName: Joi.string().trim().required(),
+  email: Joi.string().email().required(),
+  program: Joi.string().trim().required(),
+  yearLevel: Joi.number().integer().min(1).max(4).required(),
+});
 
-  if (!data.email || typeof data.email !== "string") {
-    return "Email is required and must be a string";
-  }
+const studentUpdateSchema = Joi.object({
+  firstName: Joi.string().trim(),
+  lastName: Joi.string().trim(),
+  email: Joi.string().email(),
+  program: Joi.string().trim(),
+  yearLevel: Joi.number().integer().min(1).max(4),
+}).min(1);
 
-  if (!data.program || typeof data.program !== "string") {
-    return "Program is required and must be a string";
-  }
+export const validateStudent = (data: unknown): string | null => {
+  const { error } = studentSchema.validate(data);
+  return error ? error.details[0].message : null;
+};
 
-  if (data.yearLevel === undefined || typeof data.yearLevel !== "number") {
-    return "Year level is required and must be a number";
-  }
-
-  return null;
+export const validateStudentUpdate = (data: unknown): string | null => {
+  const { error } = studentUpdateSchema.validate(data);
+  return error ? error.details[0].message : null;
 };

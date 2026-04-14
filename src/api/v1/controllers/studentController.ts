@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { HTTP } from "../../../constants/httpConstants";
-import { validateStudent } from "../validation/studentValidation";
+import { validateStudent, validateStudentUpdate } from "../validation/studentValidation";
 import {
   getAllStudents,
   getStudentById,
@@ -29,26 +29,40 @@ export const getStudentsHandler = (req: Request, res: Response): void => {
   };
 
   const students = getAllStudents(query);
-  res.status(HTTP.OK).json(students);
+
+  res.status(HTTP.OK).json({
+    success: true,
+    message: "Students retrieved successfully",
+    data: students,
+  });
 };
 
 export const getStudentByIdHandler = (req: Request, res: Response): void => {
-  const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-  const student = getStudentById(id);
+  const student = getStudentById(req.params.id);
 
   if (!student) {
-    res.status(HTTP.NOT_FOUND).json({ message: "Student not found" });
+    res.status(HTTP.NOT_FOUND).json({
+      success: false,
+      message: "Student not found",
+    });
     return;
   }
 
-  res.status(HTTP.OK).json(student);
+  res.status(HTTP.OK).json({
+    success: true,
+    message: "Student retrieved successfully",
+    data: student,
+  });
 };
 
 export const createStudentHandler = (req: Request, res: Response): void => {
   const validationError = validateStudent(req.body);
 
   if (validationError) {
-    res.status(HTTP.BAD_REQUEST).json({ message: validationError });
+    res.status(HTTP.BAD_REQUEST).json({
+      success: false,
+      message: validationError,
+    });
     return;
   }
 
@@ -63,92 +77,68 @@ export const createStudentHandler = (req: Request, res: Response): void => {
 
   try {
     const createdStudent = createStudent(newStudent);
-    res.status(HTTP.CREATED).json(createdStudent);
+
+    res.status(HTTP.CREATED).json({
+      success: true,
+      message: "Student created successfully",
+      data: createdStudent,
+    });
   } catch (error) {
     res.status(HTTP.BAD_REQUEST).json({
+      success: false,
       message: error instanceof Error ? error.message : "Unable to create student",
     });
   }
 };
 
 export const updateStudentHandler = (req: Request, res: Response): void => {
-  const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-  const updatedData = req.body;
+  const validationError = validateStudentUpdate(req.body);
 
-  if (
-    updatedData.firstName !== undefined &&
-    typeof updatedData.firstName !== "string"
-  ) {
+  if (validationError) {
     res.status(HTTP.BAD_REQUEST).json({
-      message: "First name must be a string",
-    });
-    return;
-  }
-
-  if (
-    updatedData.lastName !== undefined &&
-    typeof updatedData.lastName !== "string"
-  ) {
-    res.status(HTTP.BAD_REQUEST).json({
-      message: "Last name must be a string",
-    });
-    return;
-  }
-
-  if (
-    updatedData.email !== undefined &&
-    typeof updatedData.email !== "string"
-  ) {
-    res.status(HTTP.BAD_REQUEST).json({
-      message: "Email must be a string",
-    });
-    return;
-  }
-
-  if (
-    updatedData.program !== undefined &&
-    typeof updatedData.program !== "string"
-  ) {
-    res.status(HTTP.BAD_REQUEST).json({
-      message: "Program must be a string",
-    });
-    return;
-  }
-
-  if (
-    updatedData.yearLevel !== undefined &&
-    typeof updatedData.yearLevel !== "number"
-  ) {
-    res.status(HTTP.BAD_REQUEST).json({
-      message: "Year level must be a number",
+      success: false,
+      message: validationError,
     });
     return;
   }
 
   try {
-    const updatedStudent = updateStudent(id, updatedData);
+    const updatedStudent = updateStudent(req.params.id, req.body);
 
     if (!updatedStudent) {
-      res.status(HTTP.NOT_FOUND).json({ message: "Student not found" });
+      res.status(HTTP.NOT_FOUND).json({
+        success: false,
+        message: "Student not found",
+      });
       return;
     }
 
-    res.status(HTTP.OK).json(updatedStudent);
+    res.status(HTTP.OK).json({
+      success: true,
+      message: "Student updated successfully",
+      data: updatedStudent,
+    });
   } catch (error) {
     res.status(HTTP.BAD_REQUEST).json({
+      success: false,
       message: error instanceof Error ? error.message : "Unable to update student",
     });
   }
 };
 
 export const deleteStudentHandler = (req: Request, res: Response): void => {
-  const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-  const deleted = deleteStudent(id);
+  const deleted = deleteStudent(req.params.id);
 
   if (!deleted) {
-    res.status(HTTP.NOT_FOUND).json({ message: "Student not found" });
+    res.status(HTTP.NOT_FOUND).json({
+      success: false,
+      message: "Student not found",
+    });
     return;
   }
 
-  res.status(HTTP.OK).json({ message: "Student deleted successfully" });
+  res.status(HTTP.OK).json({
+    success: true,
+    message: "Student deleted successfully",
+  });
 };
