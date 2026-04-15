@@ -1,7 +1,7 @@
 import request from "supertest";
 import app from "../src/app";
 import { clearStudents } from "../src/api/v1/services/studentServices";
-import { clearCourses } from "../src/api/v1/services/courseService";
+import { clearCourses } from "../src/api/v1/services/courseServices";
 import { clearEnrollments } from "../src/api/v1/services/enrollmentService";
 
 describe("Enrollment API Endpoints", () => {
