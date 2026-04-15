@@ -19,8 +19,13 @@ export const getEnrollmentsHandler = (_req: Request, res: Response): void => {
   });
 };
 
-export const getEnrollmentByIdHandler = (req: Request, res: Response): void => {
-  const enrollment = getEnrollmentById(req.params.id);
+export const getEnrollmentByIdHandler = (
+  req: Request,
+  res: Response
+): void => {
+  const rawId = req.params.id;
+  const id = typeof rawId === "string" ? rawId : rawId[0];
+  const enrollment = getEnrollmentById(id);
 
   if (!enrollment) {
     res.status(HTTP.NOT_FOUND).json({
@@ -71,8 +76,13 @@ export const createEnrollmentHandler = (req: Request, res: Response): void => {
   }
 };
 
-export const deleteEnrollmentHandler = (req: Request, res: Response): void => {
-  const deleted = deleteEnrollment(req.params.id);
+export const deleteEnrollmentHandler = (
+  req: Request,
+  res: Response
+): void => {
+  const rawId = req.params.id;
+  const id = typeof rawId === "string" ? rawId : rawId[0];
+  const deleted = deleteEnrollment(id);
 
   if (!deleted) {
     res.status(HTTP.NOT_FOUND).json({

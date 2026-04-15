@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 import { HTTP } from "../../../constants/httpConstants";
-import { validateStudent, validateStudentUpdate } from "../validation/studentValidation";
+import {
+  validateStudent,
+  validateStudentUpdate,
+} from "../validation/studentValidation";
 import {
   getAllStudents,
   getStudentById,
@@ -38,7 +41,8 @@ export const getStudentsHandler = (req: Request, res: Response): void => {
 };
 
 export const getStudentByIdHandler = (req: Request, res: Response): void => {
-  const student = getStudentById(req.params.id);
+  const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const student = getStudentById(id);
 
   if (!student) {
     res.status(HTTP.NOT_FOUND).json({
@@ -77,7 +81,6 @@ export const createStudentHandler = (req: Request, res: Response): void => {
 
   try {
     const createdStudent = createStudent(newStudent);
-
     res.status(HTTP.CREATED).json({
       success: true,
       message: "Student created successfully",
@@ -92,6 +95,7 @@ export const createStudentHandler = (req: Request, res: Response): void => {
 };
 
 export const updateStudentHandler = (req: Request, res: Response): void => {
+  const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const validationError = validateStudentUpdate(req.body);
 
   if (validationError) {
@@ -103,7 +107,7 @@ export const updateStudentHandler = (req: Request, res: Response): void => {
   }
 
   try {
-    const updatedStudent = updateStudent(req.params.id, req.body);
+    const updatedStudent = updateStudent(id, req.body);
 
     if (!updatedStudent) {
       res.status(HTTP.NOT_FOUND).json({
@@ -127,7 +131,8 @@ export const updateStudentHandler = (req: Request, res: Response): void => {
 };
 
 export const deleteStudentHandler = (req: Request, res: Response): void => {
-  const deleted = deleteStudent(req.params.id);
+  const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const deleted = deleteStudent(id);
 
   if (!deleted) {
     res.status(HTTP.NOT_FOUND).json({

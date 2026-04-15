@@ -54,7 +54,8 @@ export const getStudentById = (id: string): Student | undefined => {
 
 export const createStudent = (student: Student): Student => {
   const existingStudent = findAllStudents().find(
-    (existing) => existing.email.toLowerCase() === student.email.toLowerCase()
+    (existing: Student) =>
+      existing.email.toLowerCase() === student.email.toLowerCase()
   );
 
   if (existingStudent) {
@@ -78,7 +79,7 @@ export const updateStudent = (
     const updatedEmail = updatedData.email.toLowerCase();
 
     const emailExists = findAllStudents().find(
-      (s) => s.id !== id && s.email.toLowerCase() === updatedEmail
+      (s: Student) => s.id !== id && s.email.toLowerCase() === updatedEmail
     );
 
     if (emailExists) {

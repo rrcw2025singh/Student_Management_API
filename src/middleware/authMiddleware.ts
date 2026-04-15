@@ -2,11 +2,11 @@ import { Request, Response, NextFunction } from "express";
 import { HTTP } from "../constants/httpConstants";
 
 export const authenticate = (
-  req: Request,
+  _req: Request,
   res: Response,
   next: NextFunction
 ): void => {
-  const authHeader = req.headers.authorization;
+  const authHeader = _req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     res.status(HTTP.UNAUTHORIZED).json({

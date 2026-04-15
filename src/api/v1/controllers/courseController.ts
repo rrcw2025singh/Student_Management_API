@@ -6,9 +6,12 @@ import {
   getAllCourses,
   getCourseById,
   updateCourse,
-} from "../services/courseService";
+} from "../services/courseServices";
 import { Course } from "../models/courseModel";
-import { validateCourse, validateCourseUpdate } from "../validation/courseValidation";
+import {
+  validateCourse,
+  validateCourseUpdate,
+} from "../validation/courseValidation";
 
 export const getCoursesHandler = (_req: Request, res: Response): void => {
   const courses = getAllCourses();
@@ -21,7 +24,9 @@ export const getCoursesHandler = (_req: Request, res: Response): void => {
 };
 
 export const getCourseByIdHandler = (req: Request, res: Response): void => {
-  const course = getCourseById(req.params.id);
+  const rawId = req.params.id;
+  const id = typeof rawId === "string" ? rawId : rawId[0];
+  const course = getCourseById(id);
 
   if (!course) {
     res.status(HTTP.NOT_FOUND).json({
@@ -73,6 +78,8 @@ export const createCourseHandler = (req: Request, res: Response): void => {
 };
 
 export const updateCourseHandler = (req: Request, res: Response): void => {
+  const rawId = req.params.id;
+  const id = typeof rawId === "string" ? rawId : rawId[0];
   const validationError = validateCourseUpdate(req.body);
 
   if (validationError) {
@@ -83,7 +90,7 @@ export const updateCourseHandler = (req: Request, res: Response): void => {
     return;
   }
 
-  const course = updateCourse(req.params.id, req.body);
+  const course = updateCourse(id, req.body);
 
   if (!course) {
     res.status(HTTP.NOT_FOUND).json({
@@ -101,7 +108,9 @@ export const updateCourseHandler = (req: Request, res: Response): void => {
 };
 
 export const deleteCourseHandler = (req: Request, res: Response): void => {
-  const deleted = deleteCourse(req.params.id);
+  const rawId = req.params.id;
+  const id = typeof rawId === "string" ? rawId : rawId[0];
+  const deleted = deleteCourse(id);
 
   if (!deleted) {
     res.status(HTTP.NOT_FOUND).json({
