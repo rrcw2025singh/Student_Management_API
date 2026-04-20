@@ -1,12 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import { HTTP } from "../constants/httpConstants";
+import { verifyToken } from "../utils/jwt";
 
 export const authenticate = (
-  _req: Request,
+  req: Request,
   res: Response,
   next: NextFunction
 ): void => {
-  const authHeader = _req.headers.authorization;
+  const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     res.status(HTTP.UNAUTHORIZED).json({
@@ -16,18 +17,20 @@ export const authenticate = (
     return;
   }
 
-  const token = authHeader.split(" ")[1];
+  try {
+    const token = authHeader.split(" ")[1];
+    const decoded = verifyToken(token);
 
-  if (token !== "admin-token" && token !== "user-token") {
+    res.locals.user = decoded;
+    res.locals.userRole = decoded.role;
+
+    next();
+  } catch {
     res.status(HTTP.UNAUTHORIZED).json({
       success: false,
-      message: "Unauthorized. Invalid token.",
+      message: "Unauthorized. Invalid or expired token.",
     });
-    return;
   }
-
-  res.locals.userRole = token === "admin-token" ? "admin" : "user";
-  next();
 };
 
 export const authorizeAdmin = (
