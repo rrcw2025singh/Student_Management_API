@@ -25,6 +25,13 @@ app.use("/api/v1/students", studentRoutes);
 app.use("/api/v1/courses", courseRoutes);
 app.use("/api/v1/enrollments", enrollmentRoutes);
 
+app.use((_req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+  });
+});
+
 app.use(errorHandler);
 
 export default app;
