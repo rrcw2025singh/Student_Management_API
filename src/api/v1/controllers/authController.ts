@@ -3,7 +3,10 @@ import { HTTP } from "../../../constants/httpConstants";
 import { loginUser, registerUser } from "../services/authService";
 import { validateLogin, validateRegister } from "../validation/authValidation";
 
-export const registerHandler = (req: Request, res: Response): void => {
+export const registerHandler = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const validationError = validateRegister(req.body);
 
   if (validationError) {
@@ -15,7 +18,11 @@ export const registerHandler = (req: Request, res: Response): void => {
   }
 
   try {
-    const user = registerUser(req.body.email, req.body.password, req.body.role);
+    const user = await registerUser(
+      req.body.email,
+      req.body.password,
+      req.body.role
+    );
 
     res.status(HTTP.CREATED).json({
       success: true,
@@ -34,7 +41,10 @@ export const registerHandler = (req: Request, res: Response): void => {
   }
 };
 
-export const loginHandler = (req: Request, res: Response): void => {
+export const loginHandler = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const validationError = validateLogin(req.body);
 
   if (validationError) {
@@ -46,7 +56,7 @@ export const loginHandler = (req: Request, res: Response): void => {
   }
 
   try {
-    const result = loginUser(req.body.email, req.body.password);
+    const result = await loginUser(req.body.email, req.body.password);
 
     res.status(HTTP.OK).json({
       success: true,

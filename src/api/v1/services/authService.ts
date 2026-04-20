@@ -1,25 +1,27 @@
+import bcrypt from "bcryptjs";
 import { User } from "../models/authModel";
+import { generateToken } from "../../../utils/jwt";
 
 let users: User[] = [
   {
     id: "1",
     email: "admin@example.com",
-    password: "admin123",
+    password: bcrypt.hashSync("admin123", 10),
     role: "admin",
   },
   {
     id: "2",
     email: "user@example.com",
-    password: "user123",
+    password: bcrypt.hashSync("user123", 10),
     role: "user",
   },
 ];
 
-export const registerUser = (
+export const registerUser = async (
   email: string,
   password: string,
   role: "admin" | "user"
-): User => {
+): Promise<User> => {
   const existingUser = users.find(
     (user) => user.email.toLowerCase() === email.toLowerCase()
   );
@@ -28,10 +30,12 @@ export const registerUser = (
     throw new Error("User already exists");
   }
 
+  const hashedPassword = await bcrypt.hash(password, 10);
+
   const newUser: User = {
     id: Date.now().toString(),
     email,
-    password,
+    password: hashedPassword,
     role,
   };
 
@@ -39,22 +43,32 @@ export const registerUser = (
   return newUser;
 };
 
-export const loginUser = (
+export const loginUser = async (
   email: string,
   password: string
-): { token: string; role: "admin" | "user" } => {
+): Promise<{ token: string; role: "admin" | "user" }> => {
   const user = users.find(
-    (item) =>
-      item.email.toLowerCase() === email.toLowerCase() &&
-      item.password === password
+    (item) => item.email.toLowerCase() === email.toLowerCase()
   );
 
   if (!user) {
     throw new Error("Invalid email or password");
   }
 
+  const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordCorrect) {
+    throw new Error("Invalid email or password");
+  }
+
+  const token = generateToken({
+    id: user.id,
+    email: user.email,
+    role: user.role,
+  });
+
   return {
-    token: user.role === "admin" ? "admin-token" : "user-token",
+    token,
     role: user.role,
   };
 };
@@ -64,13 +78,13 @@ export const resetUsers = (): void => {
     {
       id: "1",
       email: "admin@example.com",
-      password: "admin123",
+      password: bcrypt.hashSync("admin123", 10),
       role: "admin",
     },
     {
       id: "2",
       email: "user@example.com",
-      password: "user123",
+      password: bcrypt.hashSync("user123", 10),
       role: "user",
     },
   ];
