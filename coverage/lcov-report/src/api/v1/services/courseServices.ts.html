@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">60.86% </span>
+                <span class="strong">78.26% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>14/23</span>
-            </div>
-        
-            
-            <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
-                <span class="quiet">Branches</span>
-                <span class='fraction'>0/2</span>
-            </div>
-        
-            
-            <div class='fl pad1y space-right2'>
-                <span class="strong">14.28% </span>
-                <span class="quiet">Functions</span>
-                <span class='fraction'>1/7</span>
+                <span class='fraction'>18/23</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">50% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>1/2</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">42.85% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>3/7</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">71.42% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>7/14</span>
+                <span class='fraction'>10/14</span>
             </div>
         
             
@@ -115,15 +115,15 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
@@ -135,7 +135,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span></td><td class="text"><pre class="prettyprint lang-js">import { Course } from "../models/courseModel";
+<span class="cline-any cline-yes">6x</span></td><td class="text"><pre class="prettyprint lang-js">import { Course } from "../models/courseModel";
 import {
   addCourse,
   findAllCourses,
@@ -145,21 +145,21 @@ import {
   updateCourseById,
 } from "../repositories/courseRepository";
 &nbsp;
-export const getAllCourses = <span class="fstat-no" title="function not covered" >(): Course[] =</span>&gt; <span class="cstat-no" title="statement not covered" >findAllCourses();</span>
+export const getAllCourses = (): Course[] =&gt; findAllCourses();
 &nbsp;
 export const getCourseById = <span class="fstat-no" title="function not covered" >(i</span>d: string): Course | undefined =&gt;
 <span class="cstat-no" title="statement not covered" >  findCourseById(id);</span>
 &nbsp;
-export const createCourse = <span class="fstat-no" title="function not covered" >(c</span>ourse: Course): Course =&gt; {
-  const existingCourse = <span class="cstat-no" title="statement not covered" >findAllCourses().find(</span>
+export const createCourse = (course: Course): Course =&gt; {
+  const existingCourse = findAllCourses().find(
 <span class="fstat-no" title="function not covered" >    (i</span>tem) =&gt; <span class="cstat-no" title="statement not covered" >item.code.toLowerCase() === course.code.toLowerCase()</span>
   );
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if (existingCourse) {</span>
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (existingCourse) {
 <span class="cstat-no" title="statement not covered" >    throw new Error("Course with this code already exists");</span>
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return addCourse(course);</span>
+  return addCourse(course);
 };
 &nbsp;
 export const updateCourse = <span class="fstat-no" title="function not covered" >(</span>
@@ -178,7 +178,7 @@ export const clearCourses = (): void =&gt; resetCourses();</pre></td></tr></tabl
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-24T18:01:37.620Z
+                at 2026-04-24T18:10:47.252Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

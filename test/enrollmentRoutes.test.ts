@@ -30,7 +30,7 @@ describe("Enrollment API Endpoints", () => {
       .send({
         firstName: "Karan",
         lastName: "Singh",
-        email: "karan@example.com",
+        email: "karan${Date.now()}@example.com",
         program: "AD&D",
         yearLevel: 1,
       });

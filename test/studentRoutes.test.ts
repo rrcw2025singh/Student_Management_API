@@ -283,6 +283,6 @@ describe("Student API Endpoints", () => {
     // Assert
     expect(response.status).toBe(401);
     expect(response.body.success).toBe(false);
-    expect(response.body.message).toBe("Unauthorized. Token missing");
+    expect(response.body.message).toBe("Unauthorized. Token missing.");
   });
 });
