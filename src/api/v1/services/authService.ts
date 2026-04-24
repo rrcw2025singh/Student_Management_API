@@ -1,6 +1,14 @@
 import bcrypt from "bcryptjs";
-import { User } from "../models/authModel";
 import { generateToken } from "../../../utils/jwt";
+
+type Role = "admin" | "user";
+
+interface User {
+  id: string;
+  email: string;
+  password: string;
+  role: Role;
+}
 
 let users: User[] = [
   {
@@ -9,22 +17,14 @@ let users: User[] = [
     password: bcrypt.hashSync("admin123", 10),
     role: "admin",
   },
-  {
-    id: "2",
-    email: "user@example.com",
-    password: bcrypt.hashSync("user123", 10),
-    role: "user",
-  },
 ];
 
 export const registerUser = async (
   email: string,
   password: string,
-  role: "admin" | "user"
-): Promise<User> => {
-  const existingUser = users.find(
-    (user) => user.email.toLowerCase() === email.toLowerCase()
-  );
+  role: Role
+) => {
+  const existingUser = users.find((user) => user.email === email);
 
   if (existingUser) {
     throw new Error("User already exists");
@@ -40,24 +40,24 @@ export const registerUser = async (
   };
 
   users.push(newUser);
-  return newUser;
+
+  return {
+    id: newUser.id,
+    email: newUser.email,
+    role: newUser.role,
+  };
 };
 
-export const loginUser = async (
-  email: string,
-  password: string
-): Promise<{ token: string; role: "admin" | "user" }> => {
-  const user = users.find(
-    (item) => item.email.toLowerCase() === email.toLowerCase()
-  );
+export const loginUser = async (email: string, password: string) => {
+  const user = users.find((item) => item.email === email);
 
   if (!user) {
     throw new Error("Invalid email or password");
   }
 
-  const isPasswordCorrect = await bcrypt.compare(password, user.password);
+  const isMatch = await bcrypt.compare(password, user.password);
 
-  if (!isPasswordCorrect) {
+  if (!isMatch) {
     throw new Error("Invalid email or password");
   }
 
@@ -73,19 +73,5 @@ export const loginUser = async (
   };
 };
 
-export const resetUsers = (): void => {
-  users = [
-    {
-      id: "1",
-      email: "admin@example.com",
-      password: bcrypt.hashSync("admin123", 10),
-      role: "admin",
-    },
-    {
-      id: "2",
-      email: "user@example.com",
-      password: bcrypt.hashSync("user123", 10),
-      role: "user",
-    },
-  ];
-};
+
+
