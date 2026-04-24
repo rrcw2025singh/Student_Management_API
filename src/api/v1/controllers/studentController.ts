@@ -11,9 +11,12 @@ import {
   updateStudent,
   deleteStudent,
 } from "../services/studentServices";
-import { Student, StudentQuery } from "../models/studentModel";
+import { StudentQuery } from "../models/studentModel";
 
-export const getStudentsHandler = (req: Request, res: Response): void => {
+export const getStudentsHandler = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const query: StudentQuery = {
     firstName:
       typeof req.query.firstName === "string" ? req.query.firstName : undefined,
@@ -31,7 +34,7 @@ export const getStudentsHandler = (req: Request, res: Response): void => {
         : undefined,
   };
 
-  const students = getAllStudents(query);
+  const students = await getAllStudents(query);
 
   res.status(HTTP.OK).json({
     success: true,
@@ -40,9 +43,12 @@ export const getStudentsHandler = (req: Request, res: Response): void => {
   });
 };
 
-export const getStudentByIdHandler = (req: Request, res: Response): void => {
-  const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-  const student = getStudentById(id);
+export const getStudentByIdHandler = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const id = String(req.params.id);
+  const student = await getStudentById(id);
 
   if (!student) {
     res.status(HTTP.NOT_FOUND).json({
@@ -59,7 +65,10 @@ export const getStudentByIdHandler = (req: Request, res: Response): void => {
   });
 };
 
-export const createStudentHandler = (req: Request, res: Response): void => {
+export const createStudentHandler = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const validationError = validateStudent(req.body);
 
   if (validationError) {
@@ -70,17 +79,15 @@ export const createStudentHandler = (req: Request, res: Response): void => {
     return;
   }
 
-  const newStudent: Student = {
-    id: Date.now().toString(),
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    email: req.body.email,
-    program: req.body.program,
-    yearLevel: req.body.yearLevel,
-  };
-
   try {
-    const createdStudent = createStudent(newStudent);
+    const createdStudent = await createStudent({
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      email: req.body.email,
+      program: req.body.program,
+      yearLevel: req.body.yearLevel,
+    });
+
     res.status(HTTP.CREATED).json({
       success: true,
       message: "Student created successfully",
@@ -89,13 +96,17 @@ export const createStudentHandler = (req: Request, res: Response): void => {
   } catch (error) {
     res.status(HTTP.BAD_REQUEST).json({
       success: false,
-      message: error instanceof Error ? error.message : "Unable to create student",
+      message:
+        error instanceof Error ? error.message : "Unable to create student",
     });
   }
 };
 
-export const updateStudentHandler = (req: Request, res: Response): void => {
-  const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+export const updateStudentHandler = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const id = String(req.params.id);
   const validationError = validateStudentUpdate(req.body);
 
   if (validationError) {
@@ -107,7 +118,7 @@ export const updateStudentHandler = (req: Request, res: Response): void => {
   }
 
   try {
-    const updatedStudent = updateStudent(id, req.body);
+    const updatedStudent = await updateStudent(id, req.body);
 
     if (!updatedStudent) {
       res.status(HTTP.NOT_FOUND).json({
@@ -125,14 +136,18 @@ export const updateStudentHandler = (req: Request, res: Response): void => {
   } catch (error) {
     res.status(HTTP.BAD_REQUEST).json({
       success: false,
-      message: error instanceof Error ? error.message : "Unable to update student",
+      message:
+        error instanceof Error ? error.message : "Unable to update student",
     });
   }
 };
 
-export const deleteStudentHandler = (req: Request, res: Response): void => {
-  const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-  const deleted = deleteStudent(id);
+export const deleteStudentHandler = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const id = String(req.params.id);
+  const deleted = await deleteStudent(id);
 
   if (!deleted) {
     res.status(HTTP.NOT_FOUND).json({

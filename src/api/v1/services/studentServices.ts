@@ -8,8 +8,10 @@ import {
   updateStudentById,
 } from "../repositories/studentRepository";
 
-export const getAllStudents = (query?: StudentQuery): Student[] => {
-  let result = [...findAllStudents()];
+export const getAllStudents = async (
+  query?: StudentQuery
+): Promise<Student[]> => {
+  let result = [...(await findAllStudents())];
 
   if (query?.firstName) {
     const firstName = query.firstName.toLowerCase();
@@ -48,12 +50,16 @@ export const getAllStudents = (query?: StudentQuery): Student[] => {
   return result;
 };
 
-export const getStudentById = (id: string): Student | undefined => {
+export const getStudentById = async (
+  id: string
+): Promise<Student | undefined> => {
   return findStudentById(id);
 };
 
-export const createStudent = (student: Student): Student => {
-  const existingStudent = findAllStudents().find(
+export const createStudent = async (
+  student: Omit<Student, "id">
+): Promise<Student> => {
+  const existingStudent = (await findAllStudents()).find(
     (existing: Student) =>
       existing.email.toLowerCase() === student.email.toLowerCase()
   );
@@ -65,11 +71,11 @@ export const createStudent = (student: Student): Student => {
   return addStudent(student);
 };
 
-export const updateStudent = (
+export const updateStudent = async (
   id: string,
   updatedData: Partial<Student>
-): Student | null => {
-  const student = findStudentById(id);
+): Promise<Student | null> => {
+  const student = await findStudentById(id);
 
   if (!student) {
     return null;
@@ -78,7 +84,7 @@ export const updateStudent = (
   if (updatedData.email) {
     const updatedEmail = updatedData.email.toLowerCase();
 
-    const emailExists = findAllStudents().find(
+    const emailExists = (await findAllStudents()).find(
       (s: Student) => s.id !== id && s.email.toLowerCase() === updatedEmail
     );
 
@@ -90,10 +96,10 @@ export const updateStudent = (
   return updateStudentById(id, updatedData);
 };
 
-export const deleteStudent = (id: string): boolean => {
+export const deleteStudent = async (id: string): Promise<boolean> => {
   return removeStudent(id);
 };
 
-export const clearStudents = (): void => {
-  resetStudents();
+export const clearStudents = async (): Promise<void> => {
+  await resetStudents();
 };
