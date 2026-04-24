@@ -1,9 +1,11 @@
 import jwt from "jsonwebtoken";
 
+export type UserRole = "admin" | "user";
+
 export interface JwtPayload {
   id: string;
   email: string;
-  role: "admin" | "user";
+  role: UserRole;
 }
 
 const JWT_SECRET = process.env.JWT_SECRET || "fallback_secret";
