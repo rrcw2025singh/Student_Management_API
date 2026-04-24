@@ -1,70 +1,38 @@
 import { Request, Response } from "express";
-import { HTTP } from "../../../constants/httpConstants";
 import { loginUser, registerUser } from "../services/authService";
-import { validateLogin, validateRegister } from "../validation/authValidation";
 
-export const registerHandler = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  const validationError = validateRegister(req.body);
-
-  if (validationError) {
-    res.status(HTTP.BAD_REQUEST).json({
-      success: false,
-      message: validationError,
-    });
-    return;
-  }
-
+export const registerHandler = async (req: Request, res: Response) => {
   try {
-    const user = await registerUser(
-      req.body.email,
-      req.body.password,
-      req.body.role
-    );
+    const { email, password, role } = req.body;
 
-    res.status(HTTP.CREATED).json({
+    const user = await registerUser(email, password, role);
+
+    res.status(201).json({
       success: true,
       message: "User registered successfully",
-      data: {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-      },
+      data: user,
     });
   } catch (error) {
-    res.status(HTTP.BAD_REQUEST).json({
+    res.status(400).json({
       success: false,
-      message: error instanceof Error ? error.message : "Unable to register user",
+      message: error instanceof Error ? error.message : "Registration failed",
     });
   }
 };
 
-export const loginHandler = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  const validationError = validateLogin(req.body);
-
-  if (validationError) {
-    res.status(HTTP.BAD_REQUEST).json({
-      success: false,
-      message: validationError,
-    });
-    return;
-  }
-
+export const loginHandler = async (req: Request, res: Response) => {
   try {
-    const result = await loginUser(req.body.email, req.body.password);
+    const { email, password } = req.body;
 
-    res.status(HTTP.OK).json({
+    const result = await loginUser(email, password);
+
+    res.status(200).json({
       success: true,
       message: "Login successful",
       data: result,
     });
   } catch (error) {
-    res.status(HTTP.UNAUTHORIZED).json({
+    res.status(401).json({
       success: false,
       message: error instanceof Error ? error.message : "Login failed",
     });
