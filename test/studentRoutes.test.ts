@@ -1,13 +1,22 @@
 import request from "supertest";
 import app from "../src/app";
+import { getAdminToken, getUserToken } from "./helpers/authHelper";
 import { clearStudents } from "../src/api/v1/services/studentServices";
 
 describe("Student API Endpoints", () => {
-  const adminHeader = { Authorization: "Bearer admin-token" };
-  const userHeader = { Authorization: "Bearer user-token" };
+  let adminHeader: { Authorization: string };
+  let userHeader: { Authorization: string };
 
-  beforeEach(() => {
-    clearStudents();
+  beforeAll(async () => {
+    const adminToken = await getAdminToken();
+    const userToken = await getUserToken();
+
+    adminHeader = { Authorization: `Bearer ${adminToken}` };
+    userHeader = { Authorization: `Bearer ${userToken}` };
+  });
+
+    beforeEach(async () => {
+    await clearStudents();
   });
 
   it("should create a student as admin", async () => {
@@ -274,6 +283,6 @@ describe("Student API Endpoints", () => {
     // Assert
     expect(response.status).toBe(401);
     expect(response.body.success).toBe(false);
-    expect(response.body.message).toBe("Unauthorized. Token is missing or invalid.");
+    expect(response.body.message).toBe("Unauthorized. Token missing");
   });
 });

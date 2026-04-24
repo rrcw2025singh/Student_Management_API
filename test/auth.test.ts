@@ -17,7 +17,8 @@ describe("Auth API", () => {
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true);
     expect(response.body.message).toBe("Login successful");
-    expect(response.body.data.token).toBe("admin-token");
+    expect(typeof response.body.data.token).toBe("string");
+    expect(response.body.data.token.length).toBeGreaterThan(20);
     expect(response.body.data.role).toBe("admin");
   });
 
