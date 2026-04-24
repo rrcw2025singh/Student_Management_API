@@ -1,20 +1,18 @@
 import { Request, Response, NextFunction } from "express";
-import { HTTP } from "../constants/httpConstants";
 import { verifyToken } from "../utils/jwt";
 
 export const authenticate = (
   req: Request,
   res: Response,
   next: NextFunction
-): void => {
+) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    res.status(HTTP.UNAUTHORIZED).json({
+    return res.status(401).json({
       success: false,
-      message: "Unauthorized. Token is missing or invalid.",
+      message: "Unauthorized. Token missing.",
     });
-    return;
   }
 
   try {
@@ -26,9 +24,9 @@ export const authenticate = (
 
     next();
   } catch {
-    res.status(HTTP.UNAUTHORIZED).json({
+    return res.status(401).json({
       success: false,
-      message: "Unauthorized. Invalid or expired token.",
+      message: "Unauthorized. Invalid token.",
     });
   }
 };
@@ -37,13 +35,13 @@ export const authorizeAdmin = (
   _req: Request,
   res: Response,
   next: NextFunction
-): void => {
+) => {
   if (res.locals.userRole !== "admin") {
-    res.status(HTTP.FORBIDDEN).json({
+    return res.status(403).json({
       success: false,
       message: "Forbidden. Admin access only.",
     });
-    return;
+ 
   }
 
   next();
