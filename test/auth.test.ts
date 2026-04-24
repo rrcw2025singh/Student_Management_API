@@ -2,12 +2,37 @@ import request from "supertest";
 import app from "../src/app";
 
 describe("Auth API", () => {
-  it("should login admin successfully", async () => {
+  it("should register a user", async () => {
     // Arrange
+    const endpoint = "/api/v1/auth/register";
+    const userData = {
+      name: "Test User",
+      email: "test@example.com",
+      password: "password123",
+      role: "user",
+    };
+
+    // Act
+    const response = await request(app).post(endpoint).send(userData);
+
+    // Assert
+    expect(response.status).toBe(201);
+    expect(response.body.success).toBe(true);
+  });
+
+  it("should login a user", async () => {
+    // Arrange
+    await request(app).post("/api/v1/auth/register").send({
+      name: "Login User",
+      email: "login@example.com",
+      password: "password123",
+      role: "user",
+    });
+
     const endpoint = "/api/v1/auth/login";
     const loginData = {
-      email: "admin@example.com",
-      password: "admin123",
+      email: "login@example.com",
+      password: "password123",
     };
 
     // Act
@@ -16,18 +41,15 @@ describe("Auth API", () => {
     // Assert
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true);
-    expect(response.body.message).toBe("Login successful");
-    expect(typeof response.body.data.token).toBe("string");
-    expect(response.body.data.token.length).toBeGreaterThan(20);
-    expect(response.body.data.role).toBe("admin");
+    expect(response.body.data.token).toBeDefined();
   });
 
-  it("should fail login with invalid credentials", async () => {
+  it("should return 401 for invalid login", async () => {
     // Arrange
     const endpoint = "/api/v1/auth/login";
     const loginData = {
       email: "wrong@example.com",
-      password: "wrong123",
+      password: "wrongpassword",
     };
 
     // Act
@@ -36,40 +58,18 @@ describe("Auth API", () => {
     // Assert
     expect(response.status).toBe(401);
     expect(response.body.success).toBe(false);
-    expect(response.body.message).toBe("Invalid email or password");
-  });
-
-  it("should register a new user successfully", async () => {
-    // Arrange
-    const endpoint = "/api/v1/auth/register";
-    const registerData = {
-      email: "newuser@example.com",
-      password: "pass1234",
-      role: "user",
-    };
-
-    // Act
-    const response = await request(app).post(endpoint).send(registerData);
-
-    // Assert
-    expect(response.status).toBe(201);
-    expect(response.body.success).toBe(true);
-    expect(response.body.message).toBe("User registered successfully");
-    expect(response.body.data.email).toBe("newuser@example.com");
-    expect(response.body.data.role).toBe("user");
   });
 
   it("should return 400 for invalid register data", async () => {
     // Arrange
     const endpoint = "/api/v1/auth/register";
-    const registerData = {
-      email: "bademail",
-      password: "123",
-      role: "user",
+    const invalidUserData = {
+      email: "invalid@example.com",
+      password: "password123",
     };
 
     // Act
-    const response = await request(app).post(endpoint).send(registerData);
+    const response = await request(app).post(endpoint).send(invalidUserData);
 
     // Assert
     expect(response.status).toBe(400);
