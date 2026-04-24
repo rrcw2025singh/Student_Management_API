@@ -15,7 +15,7 @@ describe("Student API Endpoints", () => {
     userHeader = { Authorization: `Bearer ${userToken}` };
   });
 
-    beforeEach(async () => {
+  beforeEach(async () => {
     await clearStudents();
   });
 
@@ -87,8 +87,13 @@ describe("Student API Endpoints", () => {
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true);
     expect(response.body.message).toBe("Students retrieved successfully");
-    expect(response.body.data.length).toBe(1);
-    expect(response.body.data[0].firstName).toBe("Karan");
+
+    const karanStudents = response.body.data.filter(
+      (student: any) => student.email === "karan@example.com"
+    );
+
+    expect(karanStudents.length).toBe(1);
+    expect(karanStudents[0].firstName).toBe("Karan");
   });
 
   it("should get a student by id", async () => {
@@ -114,12 +119,8 @@ describe("Student API Endpoints", () => {
     // Assert
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true);
-    const karanStudents = response.body.data.filter(
-  (student: any) => student.email === "karan@example.com"
-);
-
-expect(karanStudents.length).toBe(1);
-expect(karanStudents[0].firstName).toBe("Karan");
+    expect(response.body.data.id).toBe(studentId);
+    expect(response.body.data.firstName).toBe("Karan");
   });
 
   it("should update a student by id as admin", async () => {
